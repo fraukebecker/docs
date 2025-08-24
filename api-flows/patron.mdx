@@ -1,0 +1,59 @@
+# Patron API Flow
+
+Description of API Flow.
+
+## 1. Browsing the food categories
+Patrons browse through the available food categories.
+
+### Request
+
+The client sends an HTTP request to get the list of avaialable dishes.
+
+`curl -X GET "https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/dishes"`.
+
+### Response
+
+If the request was successful, the server responds with a `200` status code with the response body containing the fields `description`, `category`, `price` and a list of incredients.
+
+Example:
+```JSON
+{
+            "id": "687e2e8949e4c43816685023",
+            "created_at": "2025-03-19T02:41:05.794Z",
+            "updated_at": "2025-07-21T10:35:21.639Z",
+            "name": "Bruschetta al Pomodoro",
+            "description": "Toasted bread topped with a mixture of ripe tomatoes, garlic, basil, and olive oil.",
+            "category": "Appetizer",
+            "preparation_time": 25,
+            "price": 999,
+            "image_name": "bruschetta_al_pomodoro",
+            "station": "cold",
+            "ingredients": [
+                {
+                    "ingredient_id": "687e2e8949e4c43816684ff4",
+                    "is_essential": false,
+                    "_id": "687e2e8949e4c43816685024"
+                },
+                {
+                    "ingredient_id": "687e2e8949e4c43816685018",
+                    "is_essential": true,
+                    "_id": "687e2e8949e4c43816685025"
+                },
+                {
+                    "ingredient_id": "687e2e8949e4c4381668501c",
+                    "is_essential": true,
+                    "_id": "687e2e8949e4c43816685026"
+                }
+            ]
+        }
+```
+
+## 2. Step 2 Title
+
+### Request
+
+See previous example.
+
+### Response
+
+See previous example.
