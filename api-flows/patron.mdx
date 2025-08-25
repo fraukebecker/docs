@@ -3,11 +3,12 @@
 Description of API Flow.
 
 ## 1. Browsing the food categories
+
 Patrons browse through the available food categories.
 
 ### Request
 
-The client sends an HTTP request to get the list of avaialable dishes.
+The client sends an HTTP request to get the list of available dishes.
 
 `curl -X GET "https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/dishes"`.
 
@@ -16,6 +17,7 @@ The client sends an HTTP request to get the list of avaialable dishes.
 If the request was successful, the server responds with a `200` status code with the response body containing the fields `description`, `category`, `price` and a list of incredients.
 
 Example:
+
 ```JSON
 {
             "id": "687e2e8949e4c43816685023",
@@ -48,12 +50,86 @@ Example:
         }
 ```
 
-## 2. Step 2 Title
+## 2. Checking the ingredient quantities
+
+The client app must check inventory for necessary ingredients before displaying dishes in the UI. Each dish references ingredient IDs, identifying essential ones. If an essential ingredient is out of stock, the UI will disable dish selection.
 
 ### Request
 
-See previous example.
+The client sends an HTTP request to verify ingredient quantities at the designated endpoint:
+
+`curl -X 'GET' \\
+'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/ingredients/' \\
+-H 'accept: application/json'`
 
 ### Response
 
-See previous example.
+If the request was successful, the server responds with a `200` status code with the response body containing the field `in_stock_qty`. If any essential ingredients are out of stock, the client does not display the respective dish in the navigation.
+
+Example:
+
+```json
+{
+
+    "results": [
+
+        {
+
+            "id": "687e2e8949e4c43816684fed",
+
+            "created_at": "2024-10-19T17:24:48.913Z",
+
+            "updated_at": "2025-07-20T19:43:12.021Z",
+
+            "name": "Gorgonzola Cheese",
+
+            "price": 299,
+
+            "in_stock_qty": 87
+
+        },
+```
+
+## 3. Viewing dish details
+
+Of all the available dishes that are being the displayed, a patron now selects a dish from the list to look at the details.
+
+### Request
+
+The client sends an HTTP request to display the dish details at the designated endpoint, filtering the response to only the fields it needs to display on the dish’s details page.:
+
+`curl -X 'GET' \\
+'{https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/dishes/{id}?fields=name%7Cprice%7Cimage_name%7Cingredients' \\
+-H 'accept: application/json'`
+
+### Response
+
+If the request was successful, the server responds with a `200` status code with the response body containing the fiels `name`, `price`, `image_name` and `ingredients`.
+
+Example
+
+```json
+{
+    "id": "687e2e8949e4c43816685023",
+    "name": "Bruschetta al Pomodoro",
+    "price": 999,
+    "image_name": "bruschetta_al_pomodoro",
+    "ingredients": [
+        {
+            "ingredient_id": "687e2e8949e4c43816684ff4",
+            "is_essential": false,
+            "_id": "687e2e8949e4c43816685024"
+        },
+        {
+            "ingredient_id": "687e2e8949e4c43816685018",
+            "is_essential": true,
+            "_id": "687e2e8949e4c43816685025"
+        },
+        {
+            "ingredient_id": "687e2e8949e4c4381668501c",
+            "is_essential": true,
+            "_id": "687e2e8949e4c43816685026"
+        }
+    ]
+}
+```
