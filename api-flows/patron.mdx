@@ -1,6 +1,6 @@
 # Patron API Flow
 
-Description of API Flow.
+Description of the patron API flow.
 
 ## 1. Browsing the food categories
 
@@ -92,7 +92,7 @@ Example:
 
 ## 3. Viewing dish details
 
-Of all the available dishes that are being the displayed, a patron now selects a dish from the list to look at the details.
+Of all the available dishes that are being displayed, a patron now selects a dish from the list to look at the details.
 
 ### Request
 
@@ -104,7 +104,7 @@ The client sends an HTTP request to display the dish details at the designated e
 
 ### Response
 
-If the request was successful, the server responds with a `200` status code with the response body containing the fiels `name`, `price`, `image_name` and `ingredients`.
+If the request was successful, the server responds with a `200` status code with the response body containing the fields `name`, `price`, `image_name` and `ingredients`.
 
 Example
 
@@ -133,3 +133,46 @@ Example
     ]
 }
 ```
+
+## 4. Adding dishes and viewing the cart
+
+The patron can add any of the available dishes into their cart. Available dishes are displayed in a list on the main page. If a patron wants to add a dish to their cart, they use the **Add** button that is displayed in the list next to the dish name. Once all dishes are added, the patron can use the **Cart** icon on the top of the page to view the cart and check the contents.
+
+## 5. Placing the order
+
+Once they have selected all dishes, the patron can proceed to placing the order.
+
+### Request
+
+The client sends an HTTP request to place the order at the designated endpoint. It includes the name of the patron, the `table_number`, all `dish_ids` and any `special_requests`.
+
+\``` url -X 'POST' \   'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/orders' \   -H 'accept: application/json' \   -H 'Authorization: Bearer a1732455-42cf-4d24-a956-84adc847c0ca' \   -H 'Content-Type: application/json' \   -d '{   "name": "Ben",   "table_number": 18,   "dish_ids": [     "692a4a34a46ecf001f35ac6f",     "6a4a857c022eb7001f9b8972",     "6b7c2441a0db43001f9bf377"   ],   "special_requests": "No peanuts.",   "scheduled at": null }'` ``
+
+### Response
+
+If the request was successful, the server responds with a `201` status code with the response body confirming the fields in the request and additionally containing the fields `created_at`, `updated_at`, as well as the status of the request, for example `Received`.
+
+Example:
+
+```json
+{
+  "id": "674d0bf5c28b69001f8e03a1",
+  "created_at": "2024-04-22T10:00:00Z",
+  "updated_at": "2024-04-22T10:00:00Z",
+  "name": "John",
+  "table_number": 8,
+  "dish_ids": [
+    "692a4a34a46ecf001f35ac6f",
+    "6a4a857c022eb7001f9b8972",
+    "6b7c2441a0db43001f9bf377"
+  ],
+  "special_requests": "string",
+  "priority": 3,
+  "scheduled_at": null,
+  "status": "Received"
+}
+```
+
+## 6. Order confirmation
+
+The server responds with the status `Received`once the order was places successfully. The UI displays a success message and the patron receives an e-mail notification confiming the order with the order details.
