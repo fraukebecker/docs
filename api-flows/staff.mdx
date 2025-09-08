@@ -15,20 +15,189 @@ To get an update on existing orders, staff can request to view a list.
 
 The client sends an HTTP request to get the list of available orders. It can filter for the status `Received`.
 
-`curl -X 'GET' \
-  'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/orders?order=asc&fields=table_number%7Cstatus&filter=table_number.lt~5%7Cstatus.eq~Received&limit=10&offset=0' \
-  -H 'accept: application/json'`
+`curl -X 'GET' \   'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/orders?filter=status.eq~Received' \   -H 'accept: application/json'`
 
 ### Response
 
+If the request was successful, the server responds with a `200` status code with the response body containing the fields `id`, `dish_ids`, `name`and if the order was scheduled `scheduled_at`. 
+
+Example:
+
+```json
+{
+    "results": [
+        {
+            "id": "687e2e8a49e4c438166850c7",
+            "name": "Janae",
+            "table_number": 11,
+            "status": "Received",
+            "priority": 5,
+            "dish_ids": [
+                "687e2e8949e4c43816685099",
+                "687e2e8949e4c43816685067",
+                "687e2e8949e4c4381668509c",
+                "687e2e8949e4c43816685060",
+                "687e2e8949e4c438166850be",
+                "687e2e8949e4c43816685092"
+            ],
+            "special_requests": null,
+            "created_at": "2025-01-25T08:24:42.826Z",
+            "updated_at": "2025-07-21T02:04:11.322Z",
+            "scheduled_at": null
+        },
+```
+
 ## 2. Prioritizing orders in the queue
+
+Staff orders the list of orders according to priority.
+
+### Request
+
+The client sends HTTP request to get the list of available orders. The list is ordered by priority and in ascending order.
+
+`curl -X 'GET' \   'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/orders?orders?sort=priority&order=asc' \   -H 'accept: application/json'`
+
+### Response
+
+If the request was successful, the server responds with a `200` status code with the response body sorted by the field`priority`and with the fields `id`, `name` of the patron that placed the order and `dish_ids`.
+
+Example:
+
+```json
+{
+    "results": [
+        {
+            "id": "687e2e8a49e4c438166850c6",
+            "name": "Edmund",
+            "table_number": 8,
+            "status": "Draft",
+            "priority": 1,
+            "dish_ids": [
+                "687e2e8949e4c43816685073",
+                "687e2e8949e4c43816685027"
+            ],
+            "special_requests": null,
+            "created_at": "2025-03-15T09:17:38.749Z",
+            "updated_at": "2025-07-20T23:40:38.106Z",
+            "scheduled_at": null
+        },
+        {
+            "id": "687e2e8a49e4c438166850e9",
+            "name": "Kurt",
+            "table_number": null,
+            "status": "Ready for Assembly",
+            "priority": 1,
+            "dish_ids": [
+                "687e2e8949e4c438166850be",
+                "687e2e8949e4c4381668507f",
+                "687e2e8949e4c43816685078",
+                "687e2e8949e4c43816685027"
+            ],
+            "special_requests": null,
+            "created_at": "2025-01-23T14:56:05.301Z",
+            "updated_at": "2025-07-20T15:40:01.962Z",
+            "scheduled_at": null
+        },
+```
 
 ## 3. Initiating the order preparation
 
+Having checked for the priorities of the orders, the staff can now set the status of the orders to `In Progress`.
+
+### Request
+
+The client sends the HTTP request to update the list of orders that have the status `Received` to `In Progress`.
+
+`curl -X 'PUT' \   'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/orders?:id?status=In Progress' \   -H 'accept: application/json'`
+
+### Response
+
+If the request was successful, the server responds with a `200` status code with the response body containing the updated resource, including the updated status `In Progress`.
+
+```json
+{
+  "name": "Ben",
+  "table_number": 18,
+  "status": "in progress",
+  "priority": 3,
+  "dish_ids": [
+    "66e687592c8d2c7a6031c34e",
+    "66e687592c8d2c7a6031c355",
+    "66e687592c8d2c7a6031c35a"
+  ],
+  "special_requests": "No peanuts",
+  "scheduled_at": null
+}
+```
+
 ## 4. Filtering the order preparation by stations
+
+The staff can send a query for which order is prepared at which station.
+
+### Request
+
+The client sends the HTTP request to get the list of dishes that are prepared at one station for an order, for example at the station `hot`.
+
+`curl -X 'GET' \\
+'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/orders/{id}/dishes?fields=dish_ids|name|image_name&filter=station.eq~hot' \\
+-H 'accept: application/json'`
+
+### Response
+
+If the request was successful, the server responds with a `200` status code with the response body containing all dishes part of the order that belong to a given station.
+
+The client stores the dish IDs to local storage for the next step.
 
 ## 5. Displaying dish ingredients
 
+To display which ingredient is part of the ordered dishes, the staff can display these.
+
+### Request
+
+The client references previously saved dish IDs and sends an HTTP request for each:
+
+`curl -X 'GET' \\
+'https://bug-free-garbanzo-q7ppv44rjgw7399pg-80.app.github.dev/dishes/:id/ingredients?fields=name' \\
+-H 'accept: application/json'`
+
+### Response
+
+If the request was successful, the server responds with a `200` status code with the response body containing a list of a dish’s ingredients.
+
+The client can now display the list of ingredients required to create a dish.
+
+Example:
+
+```json
+{
+    "results": [
+        {
+            "id": "687e2e8949e4c43816684ff4",
+            "name": "Butter"
+        },
+        {
+            "id": "687e2e8949e4c43816685018",
+            "name": "Lemon Juice"
+        },
+        {
+            "id": "687e2e8949e4c4381668501c",
+            "name": "Cream"
+        }
+    ],
+    "total_results": 3
+}
+```
+
 ## 6. Ready for Assembly
 
+When a station completes preparation of their part of the order, they mark it as "Ready for Assembly" on their KDS.
+
+The expeditor is notified when all stations have marked their parts as ready.
+
+This process is managed within the client’s logic rather than within the API.
+
 ## 7. Assembling the order
+
+The expeditor assembles the parts of the order from different stations. Once assembled, the expeditor updates the order status to **On the Way**. For takeaway orders, the expeditor changes the status to `Ready for Pickup` to indicate the order is ready for the patron.
+
+If the request was successful, the server responds with a `200` status code with the updated resource.
